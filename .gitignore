@@ -1,0 +1,59 @@
+# Virtual Environment
+ai-ocr-backend/venv/
+venv/
+ENV/
+env/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+ai-ocr-backend/__pycache__/
+ai-ocr-backend/ocr/__pycache__/
+
+# Node Modules & Next.js Build
+ai-ocr-frontend/node_modules/
+ai-ocr-frontend/.next/
+ai-ocr-frontend/out/
+ai-ocr-frontend/build/
+.next/
+node_modules/
+
+# Local Model Weights (Downloaded from Hugging Face)
+ai-ocr-backend/trocr-base-handwritten/
+*.bin
+*.pt
+*.safetensors
+
+# Database & SQLite
+*.db
+*.sqlite3
+ai-ocr-backend/ocr_results.db
+
+# Uploads, Temporary & Processed Files
+ai-ocr-backend/uploads/*
+!ai-ocr-backend/uploads/.gitkeep
+ai-ocr-backend/processed/*
+!ai-ocr-backend/processed/.gitkeep
+ai-ocr-backend/results/*
+!ai-ocr-backend/results/.gitkeep
+*.png
+*.jpg
+*.jpeg
+*.pdf
+!ai-ocr-frontend/public/*
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+ai-ocr-backend/.env
+ai-ocr-frontend/.env
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+sqlalchemy
+PyMuPDF
+opencv-python
+pillow
+numpy
+pyspellchecker
+paddleocr
+paddlepaddle
+torch
+torchvision
+transformers
+symspellpy
