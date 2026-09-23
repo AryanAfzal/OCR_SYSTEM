@@ -2,8 +2,8 @@ import re
 import os
 import json
 import urllib.request
+import symspellpy
 from symspellpy import SymSpell
-import pkg_resources
 
 # Configuration
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
@@ -13,10 +13,12 @@ OLLAMA_TIMEOUT = float(os.getenv("OLLAMA_TIMEOUT", "60.0"))
 # Initialize SymSpell for fast and accurate spelling correction
 sym_spell = SymSpell(max_dictionary_edit_distance=2, prefix_length=7)
 try:
-    dict_path = pkg_resources.resource_filename('symspellpy', 'frequency_dictionary_en_82_765.txt')
-    sym_spell.load_dictionary(dict_path, term_index=0, count_index=1)
+    base_dir = os.path.dirname(symspellpy.__file__)
+    dict_path = os.path.join(base_dir, 'frequency_dictionary_en_82_765.txt')
+    if os.path.exists(dict_path):
+        sym_spell.load_dictionary(dict_path, term_index=0, count_index=1)
     
-    bigram_path = pkg_resources.resource_filename('symspellpy', 'frequency_bigramdictionary_en_243_342.txt')
+    bigram_path = os.path.join(base_dir, 'frequency_bigramdictionary_en_243_342.txt')
     if os.path.exists(bigram_path):
         sym_spell.load_bigram_dictionary(bigram_path, term_index=0, count_index=2)
 except Exception as e:

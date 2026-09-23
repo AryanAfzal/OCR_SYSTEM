@@ -4,9 +4,9 @@ python-multipart
 python-dotenv
 sqlalchemy
 PyMuPDF
-opencv-python
 pillow
-numpy
+numpy<2
+opencv-python<=4.10.0.84
 pyspellchecker
 paddleocr
 paddlepaddle
