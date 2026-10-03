@@ -1,5 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal EnableDelayedExpansion
 
 echo =======================================================
 echo        LAUNCHING AI OCR SYSTEM (FASTAPI + NEXT.JS)
@@ -7,7 +7,7 @@ echo =======================================================
 echo.
 
 :: 1. Verify Backend venv exists
-if not exist "ai-ocr-backend\venv" (
+if not exist "ai-ocr-backend\venv\Scripts\python.exe" (
     echo [ERROR] Virtual environment not found!
     echo Please run setup.bat first to install all dependencies.
     echo.
@@ -23,14 +23,14 @@ if %errorlevel% equ 0 (
 )
 
 :: 3. Launch Backend in a new window
-echo Starting Backend (FastAPI on http://127.0.0.1:8000)...
+echo Starting Backend on http://127.0.0.1:8000 ...
 start "AI OCR Backend (FastAPI)" cmd /k "cd ai-ocr-backend && call .\venv\Scripts\activate.bat && python -m uvicorn app:app --reload --host 127.0.0.1 --port 8000"
 
 :: 4. Launch Frontend in a new window
-echo Starting Frontend (Next.js on http://localhost:3000)...
+echo Starting Frontend on http://localhost:3000 ...
 start "AI OCR Frontend (Next.js)" cmd /k "cd ai-ocr-frontend && npm run dev"
 
-:: 5. Wait 3 seconds and open browser
+:: 5. Wait 4 seconds and open browser
 echo Waiting for servers to initialize...
 timeout /t 4 /nobreak >nul
 start http://localhost:3000
@@ -40,6 +40,6 @@ echo =======================================================
 echo  Application is running!
 echo  - Frontend: http://localhost:3000
 echo  - Backend:  http://127.0.0.1:8000
-echo  (To stop, simply close the opened terminal windows)
+echo  To stop the application, close the opened terminal windows.
 echo =======================================================
 echo.

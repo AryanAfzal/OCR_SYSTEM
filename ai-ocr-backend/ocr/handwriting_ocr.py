@@ -11,16 +11,28 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 USE_GPU_PADDLE = torch.cuda.is_available()
 
 # Initialize PaddleOCR with sensitive detection parameters for handwriting
-ocr_engine = PaddleOCR(
-    use_angle_cls=True,
-    lang='en',
-    use_gpu=USE_GPU_PADDLE,
-    show_log=False,
-    det_limit_side_len=3000,
-    det_db_thresh=0.10,       # Sensitive threshold to capture light/thin handwriting
-    det_db_box_thresh=0.20,   # Keep faint handwritten boxes
-    det_db_unclip_ratio=2.0   # Adequate margins for full character ascenders/descenders
-)
+try:
+    ocr_engine = PaddleOCR(
+        use_angle_cls=True,
+        lang='en',
+        use_gpu=USE_GPU_PADDLE,
+        show_log=False,
+        det_limit_side_len=3000,
+        det_db_thresh=0.10,       # Sensitive threshold to capture light/thin handwriting
+        det_db_box_thresh=0.20,   # Keep faint handwritten boxes
+        det_db_unclip_ratio=2.0   # Adequate margins for full character ascenders/descenders
+    )
+except Exception as e:
+    print(f"PaddleOCR init fallback (retry without use_gpu): {e}")
+    ocr_engine = PaddleOCR(
+        use_angle_cls=True,
+        lang='en',
+        show_log=False,
+        det_limit_side_len=3000,
+        det_db_thresh=0.10,
+        det_db_box_thresh=0.20,
+        det_db_unclip_ratio=2.0
+    )
 
 # Initialize TrOCR for handwriting recognition
 BASE_MODEL_DIR = os.path.join(os.path.dirname(__file__), "..", "trocr-base-handwritten")
