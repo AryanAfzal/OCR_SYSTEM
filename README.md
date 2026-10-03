@@ -40,12 +40,40 @@ An end-to-end, multi-tier AI handwriting recognition and document structuring pi
 
 ---
 
-## 🚀 Quick Start Guide
+## ⚡ 1-Click Setup & Run (Recommended)
+
+### **On Windows:**
+1. **Clone the repository**:
+   ```cmd
+   git clone https://github.com/AryanAfzal/OCR_SYSTEM.git
+   cd OCR_SYSTEM
+   ```
+2. **Double-click `setup.bat`** (or run `setup.bat` in CMD/PowerShell):
+   * Automatically creates the Python virtual environment.
+   * Installs all backend dependencies and frontend packages.
+   * Creates your `.env` configuration and pulls the AI model.
+3. **Double-click `run.bat`**:
+   * Launches the FastAPI backend and Next.js frontend concurrently and opens [http://localhost:3000](http://localhost:3000) in your browser!
+
+---
+
+### **On Linux / macOS:**
+```bash
+git clone https://github.com/AryanAfzal/OCR_SYSTEM.git
+cd OCR_SYSTEM
+chmod +x setup.sh run.sh
+./setup.sh
+./run.sh
+```
+
+---
+
+## 🚀 Manual Step-by-Step Setup
 
 ### Prerequisites
-* **Python 3.10+** (Tested on Python 3.11)
+* **Python 3.10 or 3.11**
 * **Node.js 18+** & npm
-* **Ollama** (optional, recommended for local LLM post-correction): [Download Ollama](https://ollama.ai)
+* **Ollama** (optional, for LLM post-correction): [Download Ollama](https://ollama.ai)
 
 ---
 
@@ -57,8 +85,11 @@ cd ai-ocr-backend
 # Create and activate virtual environment
 python -m venv venv
 
-# Windows
+# Windows (PowerShell)
 .\venv\Scripts\Activate.ps1
+
+# Windows (CMD)
+.\venv\Scripts\activate.bat
 
 # Linux / Mac
 source venv/bin/activate
