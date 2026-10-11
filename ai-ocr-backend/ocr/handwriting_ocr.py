@@ -1,10 +1,29 @@
+import os
+import sys
+import types
+
+# Windows Defender Application Control (WDAC) / Smart App Control Guard:
+# On Windows 11 systems with Application Control enabled, unsigned compiled .pyd DLLs in optional
+# packages (like scikit-learn's _expected_mutual_info_fast) are blocked with "An Application Control policy has blocked this file".
+# Transformers optionally probes sklearn for assisted decoding (roc_curve).
+# We proactively shim and disable this probe so transformers never triggers the blocked DLL.
+if "sklearn.metrics.cluster._expected_mutual_info_fast" not in sys.modules:
+    _dummy_emi = types.ModuleType("sklearn.metrics.cluster._expected_mutual_info_fast")
+    _dummy_emi.expected_mutual_information = lambda *args, **kwargs: 0.0
+    sys.modules["sklearn.metrics.cluster._expected_mutual_info_fast"] = _dummy_emi
+
+try:
+    import transformers.utils.import_utils as _tiu
+    _tiu.is_sklearn_available = lambda: False
+except Exception:
+    pass
+
 from transformers import ViTImageProcessor, RobertaTokenizer, VisionEncoderDecoderModel
 import torch
 from paddleocr import PaddleOCR
 from PIL import Image
 import numpy as np
 import cv2
-import os
 
 # Device configuration (CUDA GPU if available, else CPU)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"

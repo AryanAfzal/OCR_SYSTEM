@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=flat&logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![PaddleOCR](https://img.shields.io/badge/PaddleOCR-2.9.1-006699?style=flat)](https://github.com/PaddlePaddle/PaddleOCR)
+[![PaddleOCR](https://img.shields.io/badge/PaddleOCR-2.7.3-006699?style=flat)](https://github.com/PaddlePaddle/PaddleOCR)
 [![HuggingFace](https://img.shields.io/badge/TrOCR-microsoft%2Ftrocr--base-FFD21E?style=flat&logo=huggingface&logoColor=black)](https://huggingface.co/microsoft/trocr-base-handwritten)
 [![Ollama](https://img.shields.io/badge/Ollama-Qwen%202.5-000000?style=flat&logo=ollama&logoColor=white)](https://ollama.ai)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.141+-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -153,7 +153,7 @@ This project resolves these challenges by introducing a **3-tier hybrid pipeline
 ## 🔬 Deep-Dive: How the Pipeline Works
 
 ### Stage 1: Adaptive Preprocessing & Normalization
-*File: [`ocr/image_processor.py`](file:///d:/dekstop%20win%2010/internship%20dekstop/deskstop/FYP/ai-ocr-system/ai-ocr-backend/ocr/image_processor.py)*
+*File: [`ocr/image_processor.py`](ai-ocr-system/ai-ocr-backend/ocr/image_processor.py)*
 
 Handwritten documents scanned from mobile apps (CamScanner) or cameras suffer from uneven illumination, shadows, and low resolution.
 1. **Dynamic Scaling**: Detects if $\max(H, W) < 2200\text{ px}$. If so, resizes using bicubic interpolation (`cv2.INTER_CUBIC`). This ensures that character stroke heights are at least $35\text{–}50\text{ px}$, preventing downsampling loss in DBNet's receptive field.
@@ -164,7 +164,7 @@ Handwritten documents scanned from mobile apps (CamScanner) or cameras suffer fr
 ---
 
 ### Stage 2: Hybrid OCR Engine (PaddleOCR + TrOCR)
-*File: [`ocr/handwriting_ocr.py`](file:///d:/dekstop%20win%2010/internship%20dekstop/deskstop/FYP/ai-ocr-system/ai-ocr-backend/ocr/handwriting_ocr.py)*
+*File: [`ocr/handwriting_ocr.py`](ai-ocr-system/ai-ocr-backend/ocr/handwriting_ocr.py)*
 
 Pure Vision Transformer models (such as `microsoft/trocr-base-handwritten`) downsample all input crops to $384 \times 384\text{ px}$. When passed an entire line of text spanning $2400\text{ px}$ horizontally, the words are compressed into illegible artifacts. Conversely, standard CRNN models struggle with connected cursive handwriting.
 
@@ -180,7 +180,7 @@ Our hybrid engine solves this:
 ---
 
 ### Stage 3: Geometric Line Clustering & Reading Order
-*File: [`ocr/handwriting_ocr.py`](file:///d:/dekstop%20win%2010/internship%20dekstop/deskstop/FYP/ai-ocr-system/ai-ocr-backend/ocr/handwriting_ocr.py)*
+*File: [`ocr/handwriting_ocr.py`](ai-ocr-system/ai-ocr-backend/ocr/handwriting_ocr.py)*
 
 Handwritten lines drift diagonally, and students write in multi-segment lines. Sorting bounding boxes purely by centroid $Y$-coordinates frequently scrambles words from line 2 into line 1.
 
@@ -195,7 +195,7 @@ $$\text{Ratio} = \frac{\text{Overlap}_Y}{\min(h_1, h_2)}$$
 ---
 
 ### Stage 4: Semantic LLM Post-Correction (Ollama)
-*File: [`ocr/text_cleaner.py`](file:///d:/dekstop%20win%2010/internship%20dekstop/deskstop/FYP/ai-ocr-system/ai-ocr-backend/ocr/text_cleaner.py)*
+*File: [`ocr/text_cleaner.py`](ai-ocr-system/ai-ocr-backend/ocr/text_cleaner.py)*
 
 The raw OCR output is piped directly into a local Large Language Model via Ollama (`qwen2.5:1.5b` or `qwen2.5:7b`).
 
@@ -222,7 +222,7 @@ If Ollama is not installed or unreachable, the system automatically falls back t
 ---
 
 ### Stage 5: Question/Answer Parsing & Disambiguation
-*File: [`app.py`](file:///d:/dekstop%20win%2010/internship%20dekstop/deskstop/FYP/ai-ocr-system/ai-ocr-backend/app.py)*
+*File: [`app.py`](ai-ocr-system/ai-ocr-backend/app.py)*
 
 The cleaned lines are parsed by an adaptive regex engine:
 * Matches question markers: `Q# 01`, `Q#02:-`, `Question 1:`, `Q1:`, `QB 01`.
@@ -284,7 +284,7 @@ ai-ocr-system/
 | Library | Exact Version | Purpose |
 |---|---|---|
 | `python` | `3.11.x` | Core Python runtime environment |
-| `paddleocr` | `2.9.1` | DBNet text line bounding box detection & SVTR recognition |
+| `paddleocr` | `2.7.3` | DBNet text line bounding box detection & SVTR recognition |
 | `paddlepaddle` | `2.6.2` | High-performance C++ deep learning backend for PaddleOCR |
 | `torch` | `2.13.0` (or `cu121`) | PyTorch tensor compute engine for TrOCR Vision Transformer |
 | `torchvision` | `0.28.0` | Computer vision tensor transforms |
@@ -475,17 +475,24 @@ Retrieves extracted questions and page images for a previously processed documen
   ```
 
 ### 2. `ValueError: Unknown argument: use_gpu` / `OneDnnContext Error`
-* **Cause**: Installing unpinned `paddleocr` installs PaddleOCR 3.x (PaddleX) which removed the `use_gpu` parameter.
+* **Cause**: Installing unpinned `paddleocr` installs PaddleOCR 3.x (PaddleX) which removed the `use_gpu` parameter and changed the CPU execution graph.
 * **Fix**: Strictly pin PaddleOCR in `requirements.txt`:
   ```powershell
-  pip install paddleocr==2.9.1 paddlepaddle==2.6.2
+  pip install paddleocr==2.7.3 paddlepaddle==2.6.2
   ```
 
 ### 3. Python 3.14 / 3.12 Default Conflicts on Windows
 * **Cause**: Deep learning libraries (PaddlePaddle, PyTorch) do not yet have pre-built Windows wheels for Python 3.14.
 * **Fix**: Install Python 3.11. Our `setup.bat` script automatically looks for `py -3.11` first.
 
-### 4. Application Control Policy Blocks `uvicorn.exe`
+### 4. `ImportError: DLL load failed while importing _expected_mutual_info_fast: An Application Control policy has blocked this file`
+* **Cause**: Windows 11 **Smart App Control (SAC)** or AppLocker blocks unsigned compiled `.pyd` C-extensions in optional packages (such as `scikit-learn`). Transformers probes for `sklearn` dynamically during candidate generator initialization.
+* **Fix**: 
+  1. Remove `scikit-learn` from `requirements.txt` (the project does not need it).
+  2. Pin `paddleocr==2.7.3` (which avoids `albumentations` and LaTeX OCR training dependencies).
+  3. `handwriting_ocr.py` includes a built-in pre-import guard that intercepts and shims the probe so `transformers` never touches `sklearn`.
+
+### 5. Application Control Policy Blocks `uvicorn.exe`
 * **Cause**: Windows security policies restrict executing third-party binaries directly from `venv\Scripts\`.
 * **Fix**: Always start Uvicorn via Python module syntax:
   ```powershell
@@ -509,4 +516,4 @@ Retrieves extracted questions and page images for a previously processed documen
 * **TrOCR**: Microsoft Research ([TrOCR on Hugging Face](https://huggingface.co/microsoft/trocr-base-handwritten)).
 * **PaddleOCR**: Baidu PaddlePaddle Open Source Team ([PaddleOCR Repository](https://github.com/PaddlePaddle/PaddleOCR)).
 * **Ollama**: Community-driven local LLM runtime ([Ollama.ai](https://ollama.ai)).
-* **Author**: Aryan Afzal & FYP Engineering Team.
+* **Author**: Aryan Afzal 
